@@ -1,5 +1,5 @@
-import 'package:daftar_belanja/daftar_belanja.dart' as daftar_belanja;
+import 'package:daftar_belanja/controller.dart';
 
-void main(List<String> arguments) {
-  print('Hello world: ${daftar_belanja.calculate()}!');
+void main() {
+  start();
 }
