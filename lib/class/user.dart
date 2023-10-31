@@ -13,8 +13,9 @@ abstract class User {
   String get nama => _nama!;
   int get id => _userId!;
 
-  Future<bool> createAccount(String nama, String password, String nomorTelepon, String alamat, String email);
-  Future<bool> login(String email, String password);
+  Future<dynamic> createAccount(String nama, String password, String nomorTelepon, String alamat, String email);
+  Future<dynamic> login(String email, String password);
+  // Future<dynamic> update(String nama, String password, String nomorTelepon, String alamat, String email); (Tambahkkan Fitur Ini)
   Future<bool> deleteAccount();
   bool logOut();
 
@@ -106,6 +107,13 @@ class CommonUser extends User {
     if (_userId == null && _nama == null && _nomorTelepon == null && _alamat == null && _email == null) {
       throw(Exception("Status Sudah Tidak Login !"));
     } else {
+
+      List<DaftarBelanja> daftarBelanja = await getAllDaftarBelanja();
+
+      for (DaftarBelanja daftar in daftarBelanja) {
+        await daftar.delete();
+      }
+
       MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
 
       Results hasil = await koneksi.query("DELETE FROM users WHERE user_id = ?", [_userId]);
@@ -172,14 +180,14 @@ class Seller extends User {
   }
 
   @override
-  Future<bool> createAccount(String nama, String password, String nomorTelepon, String alamat, String email, [String? namaToko]) async {
+  Future<DaftarProduk> createAccount(String nama, String password, String nomorTelepon, String alamat, String email, [String? namaToko]) async {
     if (validator.isLength(password, 8)) {
       throw(ArgumentError("Password Minimal 8 Karakter"));
     }
 
     MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
 
-    Results hasil = await koneksi.query("INSERT INTO sellers (name, nama_toko, nomor_telepon, alamat, email, password) VALUES (?, ?, ?, ?, ?, ?)",
+    Results hasil = await koneksi.query("INSERT INTO users (name, nama_toko, nomor_telepon, alamat, email, password) VALUES (?, ?, ?, ?, ?, ?)",
       [nama, namaToko, nomorTelepon, alamat, email, password]
     );
 
@@ -192,15 +200,27 @@ class Seller extends User {
     _alamat = alamat;
     _email = email;
 
-    return true;
+    DaftarProduk daftarProduk = await _buatDaftar("seller_$_namaToko");
+
+    return daftarProduk;
+  }
+
+  Future<DaftarProduk> _buatDaftar(String namaDaftar) async {
+    MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
+
+    Results hasil = await koneksi.query("INSERT INTO daftar_barang (nama_daftar, user_id) VALUES (?, ?)", [namaDaftar, _userId]);
+
+    Results date = await koneksi.query("SELECT date_created, date_updated FROM daftar_barang WHERE id = ?", [hasil.insertId]);
+
+    await koneksi.close();
+
+    DaftarProduk daftar = DaftarProduk.init(hasil.insertId, namaDaftar, date.first[0].toString(), date.first[1].toString());
+
+    return daftar;
   }
 
   @override
-  Future<bool> login(String email, String password) async {
-    if (!validator.isEmail(email)) {
-      throw(ArgumentError("Email tidak valid"));
-    }
-
+  Future<DaftarProduk> login(String email, String password) async {
     if (validator.isLength(password, 8)) {
       throw(ArgumentError("Password Minimal 8 Karakter"));
     }
@@ -208,7 +228,7 @@ class Seller extends User {
     MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
 
     Results hasil = await koneksi.query(
-      "SELECT * FROM sellers WHERE email = ? AND password = ?",
+      "SELECT * FROM users WHERE email = ? AND password = ?",
       [email, password]
     );
 
@@ -223,9 +243,31 @@ class Seller extends User {
       _alamat = user['alamat'].toString();
       _email = user['email'];
 
-      return true;
+      DaftarProduk daftarProduk = await _getSpesificDaftarProduk();
+
+      return daftarProduk;
     } else if (hasil.isEmpty) {
       throw(Exception("Gagal Login!"));
+    } else {
+      throw(Exception("Ada Kesalahan!"));
+    }
+  }
+
+  Future<DaftarProduk> _getSpesificDaftarProduk() async {
+    MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
+
+    Results hasil = await koneksi.query("SELECT * FROM daftar_barang WHERE user_id = ?", [_userId]);
+
+    await koneksi.close();
+
+    if (hasil.length == 1) {
+      Map<String, dynamic> data = hasil.first.fields;
+
+      DaftarProduk daftarProduk = DaftarProduk.init(data['id'], data['nama_daftar'], data['date_created'].toString(), data['date_updated'].toString());
+
+      return daftarProduk;
+    } else if (hasil.isEmpty) {
+      throw(Exception("Gagal Mendapatkan Daftar Produk!"));
     } else {
       throw(Exception("Ada Kesalahan!"));
     }
@@ -246,9 +288,13 @@ class Seller extends User {
     if (_userId == null && _nama == null && _namaToko == null && _nomorTelepon == null && _alamat == null && _email == null) {
       throw(Exception("Status Sudah Tidak Login !"));
     } else {
+      DaftarProduk daftarProduk = await _getSpesificDaftarProduk();
+
+      await daftarProduk.delete();
+
       MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
 
-      Results hasil = await koneksi.query("DELETE FROM sellers WHERE user_id = ?", [_userId]);
+      Results hasil = await koneksi.query("DELETE FROM users WHERE user_id = ?", [_userId]);
 
       await koneksi.close();
 
@@ -261,6 +307,23 @@ class Seller extends User {
         throw(Exception("Ada Kesalahan !"));
       }
     }
+  }
+
+  static Future<List<Map<String, dynamic>>> getAllSeller() async {
+    List<Map<String, dynamic>> daftarSeller = [];
+    MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
+
+    Results hasil = await koneksi.query("SELECT * FROM users WHERE nama_toko IS NOT NULL");
+
+    await koneksi.close();
+
+    for (ResultRow seller in hasil) {
+      Map<String, dynamic> dataSeller = seller.fields;
+
+      daftarSeller.add(dataSeller);
+    }
+
+    return daftarSeller;
   }
 
 }

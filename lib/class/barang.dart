@@ -12,6 +12,8 @@ class Barang {
 
   int get harga => _harga!;
 
+  int get kuantitas => _kuantitas!;
+
   Barang();
   Barang.init(this._idBarang, this._nama, this._harga, this._deskripsi, this._kategori, this._kuantitas, [this._url]);
 
@@ -38,6 +40,35 @@ class Barang {
       throw(Exception("Gagal Mendapatkan Barang !"));
     } else {
       throw(Exception("Ada Kesalahan !"));
+    }
+  }
+
+  Future<bool> update(String nama, int harga, String? deskripsi, String kategori, int kuantitas, [String? url]) async {
+    if (_idBarang == null && _nama == null && _harga == null && _deskripsi == null && _kategori == null && _kuantitas == null && _url == null) {
+      throw(Exception("Tidak Ada Data Barang !"));
+    } else {
+      MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
+
+      Results hasil = await koneksi.query("UPDATE barang SET nama = ?, harga = ?, deskripsi = ?, kategori = ?, kuantitas = ?, url = ? WHERE id = ?",
+        [nama, harga, deskripsi, kategori, kuantitas, url, _idBarang]
+      );
+
+      await koneksi.close();
+
+      if (hasil.affectedRows == 1) {
+        _nama = nama;
+        _harga = harga;
+        _deskripsi = deskripsi;
+        _kategori = kategori;
+        _kuantitas = kuantitas;
+        _url = url;
+
+        return true;
+      } else if (hasil.affectedRows == 0) {
+        throw(Exception("Tidak Menemukan Barang yang Ingin Di-update !"));
+      } else {
+        throw(Exception("Ada Kesalahan!"));
+      }
     }
   }
 
@@ -68,7 +99,7 @@ class Barang {
       "ID": _idBarang,
       "Nama": _nama,
       "Harga": _harga,
-      "Desripsi": _deskripsi,
+      "Deskripsi": _deskripsi,
       "Kategori": _kategori,
       "Kuantitas": _kuantitas
     };
