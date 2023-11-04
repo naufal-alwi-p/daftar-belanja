@@ -7,6 +7,7 @@ import 'package:string_validator/string_validator.dart' as validator;
 
 Console console = Console();
 
+/// Tampilan Header Aplikasi
 void header(String pageName, {String? error, String? loggedUser}) {
   console.setForegroundColor(ConsoleColor.brightGreen);
   console.setTextStyle(bold: true);
@@ -382,8 +383,10 @@ Future<int> spesificList(
       print(tabel);
 
       console.setTextStyle(bold: true);
-      console.write("Total Harga: ");
+      console.setForegroundColor(ConsoleColor.blue);
+      console.write("Total Harga: Rp ");
       console.setTextStyle(bold: false);
+      console.resetColorAttributes();
       console.writeLine(totalHarga);
 
       List<String> opsi = ["Tambah Barang", "Lihat Detail Barang", "Edit Tabel", "Hapus Tabel", "Kembali"];

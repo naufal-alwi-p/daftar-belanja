@@ -3,6 +3,7 @@ import 'package:daftar_belanja/class/daftar.dart';
 import 'package:daftar_belanja/class/user.dart';
 import 'package:daftar_belanja/display.dart';
 
+/// Mulai Jalankan Aplikasi
 Future<void> start() async {
   console.clearScreen();
   int? opsi;
@@ -28,6 +29,7 @@ Future<void> start() async {
   }
 }
 
+/// Rute Untuk Common User
 Future<void> commonUserRoutine() async {
   String? err;
   CommonUser user = CommonUser();
@@ -72,6 +74,7 @@ Future<void> commonUserRoutine() async {
   await homepageRoutine(user: user);
 }
 
+/// Rute Untuk Seller
 Future<void> sellerRoutine() async {
   String? err;
   Seller user = Seller();
@@ -122,7 +125,13 @@ Future<void> homepageRoutine({CommonUser? user, Seller? seller, DaftarProduk? da
       } else if (opsi == 1) {
         String namaDaftar = buatDaftarBelanjaForm();
 
-        await user.buatDaftar(namaDaftar);
+        try {
+          await user.buatDaftar(namaDaftar);
+        } catch (e) {
+          err = e.toString();
+          continue;
+        }
+
 
       } else if (opsi == 2) {
         if (await showMyProfileRoutine(user)) {
@@ -187,13 +196,13 @@ Future<void> selectListRoutine(CommonUser user) async {
     if (daftarBelanja == null) {
       return;
     } else {
-      await showSpesificList(user: user, daftarBelanja: daftarBelanja);
+      await showSpesificListRoutine(user: user, daftarBelanja: daftarBelanja);
       return;
     }
   }
 }
 
-Future<void> showSpesificList(
+Future<void> showSpesificListRoutine(
     {required CommonUser user, DaftarBelanja? daftarBelanja, DaftarProduk? daftarProduk}) async {
     if (daftarBelanja != null) {
       while (true) {
