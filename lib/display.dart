@@ -54,12 +54,12 @@ int menuLogin({String? error}) {
 }
 
 List loginPage() {
-  header("Login Form");
-
   late String email, password;
   bool? confirmation;
 
   while (confirmation != true) {
+    header("Login Form");
+
     email = Input(
       prompt: "Email:",
       validator: (email) {
@@ -73,6 +73,10 @@ List loginPage() {
     password = Password(prompt: "Password:").interact();
 
     confirmation = Confirm(prompt: "Submit?", waitForNewLine: true).interact();
+
+    if (confirmation != true) {
+      console.clearScreen();
+    }
   }
 
   console.clearScreen();
@@ -81,17 +85,17 @@ List loginPage() {
 }
 
 List createAccountPage(User user) {
-  header("Create Account Form");
-
-  console.setTextStyle(bold: true);
-  console.writeLine("Masukkan Data Berikut");
-  console.setTextStyle(bold: false);
-
   late String nama, nomorTelepon, alamat, email, password;
   String? namaToko;
   bool? confirmation;
 
   while (confirmation != true) {
+    header("Create Account Form");
+
+    console.setTextStyle(bold: true);
+    console.writeLine("Masukkan Data Berikut");
+    console.setTextStyle(bold: false);
+
     nama = Input(
         prompt: "Nama:",
         validator: (nama) {
@@ -152,6 +156,10 @@ List createAccountPage(User user) {
     ).interact();
 
     confirmation = Confirm(prompt: "Submit?", waitForNewLine: true).interact();
+
+    if (confirmation != true) {
+      console.clearScreen();
+    }
   }
 
   console.clearScreen();
@@ -172,11 +180,11 @@ Future<int> homepage({CommonUser? user, Seller? seller, DaftarProduk? daftarProd
 
   if (user != null) {
     tabel
+      ..title = "List Daftar Belanja"
       ..insertColumn(header: 'No.')
       ..insertColumn(header: 'Nama Daftar', alignment: TextAlignment.center)
       ..insertColumn(header: 'Date Created', alignment: TextAlignment.center)
-      ..insertColumn(header: 'Date Update', alignment: TextAlignment.center)
-      ..title = "List Daftar Belanja";
+      ..insertColumn(header: 'Date Update', alignment: TextAlignment.center);
 
     pageName = "User Homepage";
     opsi = ["Pilih Daftar Belanja", "Buat Daftar Belanja", "Show My Profile"];
@@ -200,14 +208,15 @@ Future<int> homepage({CommonUser? user, Seller? seller, DaftarProduk? daftarProd
       ..insertColumn(header: "Stok", alignment: TextAlignment.center)
       ..insertColumn(header: "URL", alignment: TextAlignment.center);
 
+    pageName = "Seller Homepage";
+    opsi = ["Tambah Produk", "Tampilkan Detail Produk", "Show My Profile"];
+    userName = seller.nama;
+
     List<Barang> listBarang = await daftarProduk.getAllBarang();
-    opsi = [];
     int index = 1;
 
     for (Barang barang in listBarang) {
       Map data = barang.showDetail();
-
-      opsi.add("$index. ${data['Nama']}");
 
       List<Object> row = [
         index++,
@@ -220,15 +229,6 @@ Future<int> homepage({CommonUser? user, Seller? seller, DaftarProduk? daftarProd
 
       tabel.insertRow(row);
     }
-
-    pageName = "Seller Homepage";
-    opsi = [
-      "Tambah Produk",
-      "Tampilkan Detail Produk",
-      "Show My Profile"
-    ];
-    userName = seller.nama;
-    tabel.title = "List Produk";
   }
 
   header(pageName, error: error, loggedUser: userName);
@@ -287,15 +287,19 @@ int showProfile(User user, {String? error}) {
 }
 
 String buatDaftarBelanjaForm() {
-  header("Form Daftar Belanja");
-
   late String namaDaftar;
   bool? confirmation;
 
   while (confirmation != true) {
+    header("Form Daftar Belanja");
+
     namaDaftar = Input(prompt: "Nama Daftar:").interact();
 
     confirmation = Confirm(prompt: "Submit?", waitForNewLine: true).interact();
+
+    if (confirmation != true) {
+      console.clearScreen();
+    }
   }
 
   console.clearScreen();
@@ -339,22 +343,18 @@ Future<DaftarBelanja?> selectList(CommonUser user) async {
   return (hasil == (opsi.length - 1)) ? null : daftarBelanja[hasil];
 }
 
-Future<int> spesificList(
-    {CommonUser? user, Seller? seller, DaftarBelanja? daftarBelanja}) async {
+Future<int> spesificList(CommonUser user, DaftarBelanja daftarBelanja, String? err) async {
   Table tabel = Table()
     ..borderStyle = BorderStyle.square
     ..borderType = BorderType.grid
-    ..headerStyle = FontStyle.bold;
-
-  if (user != null && daftarBelanja != null) {
-    tabel
-      ..title = daftarBelanja.namaDaftar
-      ..insertColumn(header: "No.")
-      ..insertColumn(header: "Nama", alignment: TextAlignment.center)
-      ..insertColumn(header: "Harga", alignment: TextAlignment.center)
-      ..insertColumn(header: "Kategori", alignment: TextAlignment.center)
-      ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
-      ..insertColumn(header: "URL", alignment: TextAlignment.center);
+    ..headerStyle = FontStyle.bold
+    ..title = daftarBelanja.namaDaftar
+    ..insertColumn(header: "No.")
+    ..insertColumn(header: "Nama", alignment: TextAlignment.center)
+    ..insertColumn(header: "Harga", alignment: TextAlignment.center)
+    ..insertColumn(header: "Kategori", alignment: TextAlignment.center)
+    ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
+    ..insertColumn(header: "URL", alignment: TextAlignment.center);
 
     List<Barang> listBarang = await daftarBelanja.getAllBarang();
     int index = 1;
@@ -378,7 +378,7 @@ Future<int> spesificList(
     }
 
     while (confirmation != true) {
-      header("Daftar Belanja", loggedUser: user.nama);
+      header("Daftar Belanja", loggedUser: user.nama, error: err);
 
       print(tabel);
 
@@ -415,18 +415,15 @@ Future<int> spesificList(
     console.clearScreen();
 
     return hasil;
-  }
-
-  return -1;
 }
 
 List tambahBarangForm({CommonUser? user, Seller? seller}) {
-  if (user != null) {
-    late String nama, harga, kategori, kuantitas;
-    String? deskripsi, url;
-    late int angkaHarga, angkaKuantitas;
-    bool? confirmationUrl, confirmationSubmit;
+  late String nama, harga, kategori, kuantitas;
+  String? deskripsi, url;
+  late int angkaHarga, angkaKuantitas;
+  bool? confirmationUrl, confirmationSubmit;
 
+  if (user != null) {
     while (confirmationSubmit != true) {
       header("Tambah Barang Form", loggedUser: user.nama);
 
@@ -472,19 +469,12 @@ List tambahBarangForm({CommonUser? user, Seller? seller}) {
       }
 
       confirmationSubmit = Confirm(prompt: "Submit", waitForNewLine: true).interact();
+
+      if (confirmationSubmit != true) {
+        console.clearScreen();
+      }
     }
-
-    console.clearScreen();
-
-    return [nama, angkaHarga, deskripsi, kategori, angkaKuantitas, url];
-
-
   } if (seller != null) {
-    late String nama, harga, kategori, kuantitas;
-    String? deskripsi, url;
-    late int angkaHarga, angkaKuantitas;
-    bool? confirmationUrl, confirmationSubmit;
-
     while (confirmationSubmit != true) {
       header("Tambah Produk Form", loggedUser: seller.nama);
       
@@ -530,14 +520,16 @@ List tambahBarangForm({CommonUser? user, Seller? seller}) {
       }
 
       confirmationSubmit = Confirm(prompt: "Submit", waitForNewLine: true).interact();
+
+      if (confirmationSubmit != true) {
+        console.clearScreen();
+      }
     }
-
-    console.clearScreen();
-
-    return [nama, angkaHarga, deskripsi, kategori, angkaKuantitas, url];
   }
 
-  return [];
+  console.clearScreen();
+
+  return [nama, angkaHarga, deskripsi, kategori, angkaKuantitas, url];
 }
 
 String editTabelForm({required CommonUser user, required DaftarBelanja daftarBelanja}) {
@@ -555,6 +547,10 @@ String editTabelForm({required CommonUser user, required DaftarBelanja daftarBel
     ).interact();
 
     confirmation = Confirm(prompt: "Submit?", waitForNewLine: true).interact();
+
+    if (confirmation != true) {
+      console.clearScreen();
+    }
   }
 
   console.clearScreen();
@@ -566,21 +562,27 @@ Future<Barang?> selectDetailBarang({CommonUser? user, Seller? seller, DaftarBela
   Table tabel = Table()
     ..borderStyle = BorderStyle.square
     ..borderType = BorderType.grid
-    ..headerStyle = FontStyle.bold;
+    ..headerStyle = FontStyle.bold
+    ..insertColumn(header: "No.")
+    ..insertColumn(header: "Nama", alignment: TextAlignment.center)
+    ..insertColumn(header: "Harga", alignment: TextAlignment.center)
+    ..insertColumn(header: "Kategori", alignment: TextAlignment.center)
+    ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
+    ..insertColumn(header: "URL", alignment: TextAlignment.center);
+
+
+  late String pageName, userName;
+  late List<Barang> listBarang;
+  List<String> opsi = [];
+  int index = 1;
 
   if (user != null && daftarBelanja != null) {
-    tabel
-      ..title = daftarBelanja.namaDaftar
-      ..insertColumn(header: "No.")
-      ..insertColumn(header: "Nama", alignment: TextAlignment.center)
-      ..insertColumn(header: "Harga", alignment: TextAlignment.center)
-      ..insertColumn(header: "Kategori", alignment: TextAlignment.center)
-      ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
-      ..insertColumn(header: "URL", alignment: TextAlignment.center);
+    tabel.title = daftarBelanja.namaDaftar;
 
-    List<Barang> listBarang = await daftarBelanja.getAllBarang();
-    List<String> opsi = [];
-    int index = 1;
+    pageName = "Detail Barang";
+    userName = user.nama;
+
+    listBarang = await daftarBelanja.getAllBarang();
 
     for (Barang barang in listBarang) {
       Map data = barang.showDetail();
@@ -600,29 +602,13 @@ Future<Barang?> selectDetailBarang({CommonUser? user, Seller? seller, DaftarBela
     }
 
     opsi.add("Kembali");
-
-    header("Detail Barang", loggedUser: user.nama);
-
-    print(tabel);
-
-    int hasil = Select(prompt: "Pilih Barang", options: opsi).interact();
-
-    console.clearScreen();
-
-    return (hasil == (opsi.length - 1)) ? null : listBarang[hasil];
   } else if (seller != null && daftarProduk != null) {
-    tabel
-      ..title = "Daftar Produk"
-      ..insertColumn(header: "No.")
-      ..insertColumn(header: "Nama", alignment: TextAlignment.center)
-      ..insertColumn(header: "Harga", alignment: TextAlignment.center)
-      ..insertColumn(header: "Kategori", alignment: TextAlignment.center)
-      ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
-      ..insertColumn(header: "URL", alignment: TextAlignment.center);
+    tabel.title = "Daftar Produk";
 
-    List<Barang> listBarang = await daftarProduk.getAllBarang();
-    List<String> opsi = [];
-    int index = 1;
+    pageName = "Detail Produk";
+    userName = seller.nama;
+
+    listBarang = await daftarProduk.getAllBarang();
 
     for (Barang barang in listBarang) {
       Map data = barang.showDetail();
@@ -642,22 +628,20 @@ Future<Barang?> selectDetailBarang({CommonUser? user, Seller? seller, DaftarBela
     }
 
     opsi.add("Kembali");
-
-    header("Detail Barang", loggedUser: seller.nama);
-
-    print(tabel);
-
-    int hasil = Select(prompt: "Pilih Barang", options: opsi).interact();
-
-    console.clearScreen();
-
-    return (hasil == (opsi.length - 1)) ? null : listBarang[hasil];
   }
 
-  return null;
+  header(pageName, loggedUser: userName);
+
+  print(tabel);
+
+  int hasil = Select(prompt: "Pilih Barang", options: opsi).interact();
+
+  console.clearScreen();
+
+  return (hasil == (opsi.length - 1)) ? null : listBarang[hasil];
 }
 
-int spesificBarang({CommonUser? user, Seller? seller, required Barang barang}) {
+int spesificBarang(User user, Barang barang, String? err) {
   Table tabel = Table()
     ..borderStyle = BorderStyle.square
     ..borderType = BorderType.grid
@@ -665,91 +649,69 @@ int spesificBarang({CommonUser? user, Seller? seller, required Barang barang}) {
     ..insertColumn()
     ..insertColumn();
 
-  if (user != null) {
+  late String pageName, userName;
+  late int hasil;
+  bool? confirmation;
+  late List<String> opsi;
+
+  if (user.runtimeType == CommonUser) {
     tabel.title = "Detail Barang";
-    late int hasil;
-    bool? confirmation;
 
-    Map<String, dynamic> data = barang.showDetail();
+    pageName = "Detail Barang";
+    userName = user.nama;
 
-    data.forEach((key, value) {
-      tabel.insertRow([key, value.toString()]);
-    });
-
-
-    while (confirmation != true) {
-      header("Detail Barang", loggedUser: user.nama);
-
-      print(tabel);
-
-      hasil = Select(prompt: "Opsi", options: ["Edit Barang", "Hapus Barang", "Kembali"]).interact();
-
-      if (hasil == 1) {
-        confirmation = Confirm(prompt: "Apakah Kamu Yakin?", waitForNewLine: true).interact();
-      } else {
-        confirmation = true;
-      }
-
-      if (confirmation == false) {
-        console.clearScreen();
-      }
-      
-    }
-
-    console.clearScreen();
-
-    return hasil;
-  } else if (seller != null) {
+    opsi = ["Edit Barang", "Hapus Barang", "Kembali"];
+  } else if (user.runtimeType == Seller) {
     tabel.title = "Detail Produk";
-    late int hasil;
-    bool? confirmation;
 
-    Map<String, dynamic> data = barang.showDetail();
+    pageName = "Detail Produk";
+    userName = user.nama;
 
-    data.forEach((key, value) {
-      tabel.insertRow([key, value.toString()]);
-    });
-
-
-    while (confirmation != true) {
-      header("Detail Barang", loggedUser: seller.nama);
-
-      print(tabel);
-
-      hasil = Select(prompt: "Opsi", options: ["Edit Produk", "Hapus Produk", "Kembali"]).interact();
-
-      if (hasil == 1) {
-        confirmation = Confirm(prompt: "Apakah Kamu Yakin?", waitForNewLine: true).interact();
-      } else {
-        confirmation = true;
-      }
-
-      if (confirmation == false) {
-        console.clearScreen();
-      }
-      
-    }
-
-    console.clearScreen();
-
-    return hasil;
+    opsi = ["Edit Produk", "Hapus Produk", "Kembali"];
   }
 
-  return -1;
+  Map<String, dynamic> data = barang.showDetail();
+
+  data.forEach((key, value) {
+    tabel.insertRow([key, value.toString()]);
+  });
+
+  while (confirmation != true) {
+    header(pageName, loggedUser: userName, error: err);
+
+    print(tabel);
+
+    hasil = Select(prompt: "Opsi", options: opsi).interact();
+
+    if (hasil == 1) {
+      confirmation = Confirm(prompt: "Apakah Kamu Yakin?", waitForNewLine: true).interact();
+    } else {
+      confirmation = true;
+    }
+
+    if (confirmation == false) {
+      console.clearScreen();
+    }
+
+  }
+
+  console.clearScreen();
+
+  return hasil;
 }
 
-List updateDataBarangForm({CommonUser? user, Seller? seller, required Barang barang}) {
-  if (user != null) {
-    header("Update Data Barang", loggedUser: user.nama);
+List updateDataBarangForm(User user, Barang barang) {
+  Map<String, dynamic> dataBarang = barang.showDetail();
 
-    Map<String, dynamic> dataBarang = barang.showDetail();
+  late String nama, harga, kategori, kuantitas;
+  String? deskripsi, url;
+  late int angkaHarga, angkaKuantitas;
+  bool? confirmationUrl, confirmationSubmit;
 
-    late String nama, harga, kategori, kuantitas;
-    String? deskripsi, url;
-    late int angkaHarga, angkaKuantitas;
-    bool? confirmationUrl, confirmationSubmit;
-
+  if (user.runtimeType == CommonUser) {
     while (confirmationSubmit != true) {
+      header("Update Data Barang", loggedUser: user.nama);
+
       nama = Input(
         prompt: "Nama Barang:",
         initialText: dataBarang['Nama']
@@ -817,22 +779,16 @@ List updateDataBarangForm({CommonUser? user, Seller? seller, required Barang bar
       }
 
       confirmationSubmit = Confirm(prompt: "Submit", waitForNewLine: true).interact();
+
+      if (confirmationSubmit != true) {
+        console.clearScreen();
+      }
     }
-
-    console.clearScreen();
-
-    return [nama, angkaHarga, deskripsi, kategori, angkaKuantitas, url];
-  } else if (seller != null) {
-    header("Update Data Produk", loggedUser: seller.nama);
-
-    Map<String, dynamic> dataBarang = barang.showDetail();
-
-    late String nama, harga, kategori, kuantitas;
-    String? deskripsi, url;
-    late int angkaHarga, angkaKuantitas;
-    bool? confirmationUrl, confirmationSubmit;
-
+    
+  } else if (user.runtimeType == Seller) {
     while (confirmationSubmit != true) {
+      header("Update Data Produk", loggedUser: user.nama);
+
       nama = Input(
         prompt: "Nama Produk:",
         initialText: dataBarang['Nama']
@@ -900,14 +856,17 @@ List updateDataBarangForm({CommonUser? user, Seller? seller, required Barang bar
       }
 
       confirmationSubmit = Confirm(prompt: "Submit", waitForNewLine: true).interact();
+
+      if (confirmationSubmit != true) {
+        console.clearScreen();
+      }
     }
 
-    console.clearScreen();
-
-    return [nama, angkaHarga, deskripsi, kategori, angkaKuantitas, url];
   }
 
-  return [];
+  console.clearScreen();
+
+  return [nama, angkaHarga, deskripsi, kategori, angkaKuantitas, url];
 }
 
 Future<List?> selectSeller(CommonUser user, List<Map<String, dynamic>> daftarSeller) async {
@@ -942,12 +901,15 @@ Future<List?> selectSeller(CommonUser user, List<Map<String, dynamic>> daftarSel
   console.clearScreen();
 
   if (hasil == opsi.length - 1) {
+    console.clearScreen();
     return null;
   } else {
     Seller seller = Seller();
     Map<String, dynamic> dataSeller = daftarSeller[hasil];
 
     DaftarProduk daftarProduk = await seller.login(dataSeller['email'], dataSeller['password']);
+
+    console.clearScreen();
 
     return [seller, daftarProduk];
   }
@@ -1000,7 +962,7 @@ Future<Barang?> selectBarangFromSeller(CommonUser user, Seller seller, DaftarPro
     return (hasil == (opsi.length - 1)) ? null : listBarang[hasil];
 }
 
-List detailBarangFromSeller(CommonUser user, Barang barang) {
+List? detailBarangFromSeller(CommonUser user, Barang barang) {
   Table tabel = Table()
     ..borderStyle = BorderStyle.square
     ..borderType = BorderType.grid
@@ -1050,20 +1012,17 @@ List detailBarangFromSeller(CommonUser user, Barang barang) {
 
         confirmation = Confirm(prompt: "Submit?", waitForNewLine: true).interact();
       } else {
-        confirmation = true;
+        console.clearScreen();
 
-        return [];
+        return null;
       }
 
       if (confirmation == false) {
         console.clearScreen();
       }
-
-      
     }
 
     console.clearScreen();
 
     return [data['Nama'], data['Harga'], data['Deskripsi'], data['Kategori'], int.parse(kuantitas), data["URL"]];
-    
 }

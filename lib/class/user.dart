@@ -158,7 +158,7 @@ class CommonUser extends User {
 
     await koneksi.close();
 
-    DaftarBelanja daftar = DaftarBelanja.init(hasil.insertId, namaDaftar, date.first[0].toString(), date.first[1].toString());
+    DaftarBelanja daftar = DaftarBelanja.init(hasil.insertId!, namaDaftar, date.first[0].toString(), date.first[1].toString());
 
     return daftar;
   }
@@ -214,7 +214,7 @@ class Seller extends User {
 
     await koneksi.close();
 
-    DaftarProduk daftar = DaftarProduk.init(hasil.insertId, namaDaftar, date.first[0].toString(), date.first[1].toString());
+    DaftarProduk daftar = DaftarProduk.init(hasil.insertId!, namaDaftar, date.first[0].toString(), date.first[1].toString());
 
     return daftar;
   }

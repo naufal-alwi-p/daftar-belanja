@@ -17,32 +17,6 @@ class Barang {
   Barang();
   Barang.init(this._idBarang, this._nama, this._harga, this._deskripsi, this._kategori, this._kuantitas, [this._url]);
 
-  Future<bool> getById(int idBarang) async {
-    MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
-
-    Results hasil = await koneksi.query("SELECT * FROM barang WHERE id = ?", [idBarang]);
-
-    await koneksi.close();
-
-    if (hasil.length == 1) {
-      Map<String, dynamic> barang = hasil.first.fields;
-
-      _idBarang = barang['id'];
-      _nama = barang['nama'];
-      _harga = barang['harga'];
-      _deskripsi = barang['deskripsi'].toString();
-      _kategori = barang['kategori'];
-      _kuantitas = barang['kuantitas'];
-      _url = barang['url'];
-
-      return true;
-    } else if (hasil.isEmpty) {
-      throw(Exception("Gagal Mendapatkan Barang !"));
-    } else {
-      throw(Exception("Ada Kesalahan !"));
-    }
-  }
-
   Future<bool> update(String nama, int harga, String? deskripsi, String kategori, int kuantitas, [String? url]) async {
     if (_idBarang == null && _nama == null && _harga == null && _deskripsi == null && _kategori == null && _kuantitas == null && _url == null) {
       throw(Exception("Tidak Ada Data Barang !"));
@@ -99,14 +73,11 @@ class Barang {
       "ID": _idBarang,
       "Nama": _nama,
       "Harga": _harga,
-      "Deskripsi": _deskripsi,
+      "Deskripsi": (_deskripsi == 'null') ? '-' : _deskripsi,
       "Kategori": _kategori,
-      "Kuantitas": _kuantitas
+      "Kuantitas": _kuantitas,
+      "URL": (_url == 'null') ? '-' : _url
     };
-
-    if (_url != null) {
-      detail["URL"] = _url;
-    }
 
     return detail;
   }

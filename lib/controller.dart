@@ -115,11 +115,12 @@ Future<void> sellerRoutine() async {
 }
 
 Future<void> homepageRoutine({CommonUser? user, Seller? seller, DaftarProduk? daftarProduk}) async {
-  while (true) {
-    String? err;
+  if (user != null) {
+    while (true) {
+      String? err;
 
-    if (user != null) {
       int opsi = await homepage(user: user, error: err);
+
       if (opsi == 0) {
         await selectListRoutine(user);
       } else if (opsi == 1) {
@@ -131,20 +132,31 @@ Future<void> homepageRoutine({CommonUser? user, Seller? seller, DaftarProduk? da
           err = e.toString();
           continue;
         }
-
-
       } else if (opsi == 2) {
         if (await showMyProfileRoutine(user)) {
           return;
         }
       }
-    } else if (seller != null && daftarProduk != null) {
+    }
+  } else if (seller != null && daftarProduk != null) {
+    while (true) {
+      String? err;
       int opsi = await homepage(seller: seller, daftarProduk: daftarProduk, error: err);
 
       if (opsi == 0) {
         List data = tambahBarangForm(seller: seller);
 
-        await daftarProduk.tambahBarang(data[0], data[1], data[2], data[3], data[4], data[5]);
+        try {
+          bool hasil = await daftarProduk.tambahBarang(data[0], data[1], data[2], data[3], data[4], data[5]);
+
+          if (!hasil) {
+            err = "Produk gagal ditambahkan";
+          }
+        } catch (e) {
+          err = e.toString();
+          continue;
+        }
+
       } else if (opsi == 1) {
         Barang? barang = await selectDetailBarang(seller: seller, daftarProduk: daftarProduk);
 
@@ -190,111 +202,153 @@ Future<bool> showMyProfileRoutine(User user) async {
 }
 
 Future<void> selectListRoutine(CommonUser user) async {
-  while (true) {
-    DaftarBelanja? daftarBelanja = await selectList(user);
+  DaftarBelanja? daftarBelanja = await selectList(user);
 
-    if (daftarBelanja == null) {
+  if (daftarBelanja != null) {
+    await showSpesificListRoutine(user, daftarBelanja);
+  }
+}
+
+Future<void> showSpesificListRoutine(CommonUser user, DaftarBelanja daftarBelanja) async {
+  while (true) {
+    String? err;
+    int opsi = await spesificList(user, daftarBelanja, err);
+
+    if (opsi == 0) {
+      List data = tambahBarangForm(user: user);
+
+      try {
+        bool hasil = await daftarBelanja.tambahBarang(data[0], data[1], data[2], data[3], data[4], data[5]);
+
+        if (!hasil) {
+          throw(Exception("Gagal Menambahkan Barang"));
+        }
+      } catch (e) {
+        err = e.toString();
+        continue;
+      }
+    } else if (opsi == 1) {
+      Barang? barang = await selectDetailBarang(user: user, daftarBelanja: daftarBelanja);
+
+      if (barang != null) {
+        await showSpesificBarangRoutine(user: user, barang: barang);
+      }
+    } else if (opsi == 2) {
+      String namaDaftar = editTabelForm(user: user, daftarBelanja: daftarBelanja);
+
+      try {
+        await daftarBelanja.update(namaDaftar);
+      } catch (e) {
+        err = e.toString();
+        continue;
+      }
+    } else if (opsi == 3) {
+      try {
+        await daftarBelanja.delete();
+        return;
+      } catch (e) {
+        err = e.toString();
+        continue;
+      }
+      
+    } else if (opsi == 4) {
       return;
-    } else {
-      await showSpesificListRoutine(user: user, daftarBelanja: daftarBelanja);
-      return;
+    } else if (opsi == 5) {
+      while (true) {
+        List<Map<String, dynamic>> daftarSeller = await Seller.getAllSeller();
+
+        List? data = await selectSeller(user, daftarSeller);
+
+        if (data != null) {
+          try {
+            bool hasil = await selectBarangFromSellerRoutine(user, daftarBelanja, data[0], data[1]);
+            if (hasil) {
+              break;
+            }
+          } catch (e) {
+            err = e.toString();
+          }
+        } else {
+          break;
+        }
+      }
     }
   }
 }
 
-Future<void> showSpesificListRoutine(
-    {required CommonUser user, DaftarBelanja? daftarBelanja, DaftarProduk? daftarProduk}) async {
-    if (daftarBelanja != null) {
-      while (true) {
-        int opsi = await spesificList(user: user, daftarBelanja: daftarBelanja);
-
-        if (opsi == 0) {
-          List data = tambahBarangForm(user: user);
-
-          if (await daftarBelanja.tambahBarang(
-              data[0], data[1], data[2], data[3], data[4], data[5])) {
-            continue;
-          }
-        } else if (opsi == 1) {
-          Barang? barang =
-              await selectDetailBarang(user: user, daftarBelanja: daftarBelanja);
-
-          if (barang != null) {
-            await showSpesificBarangRoutine(user: user, barang: barang);
-          }
-        } else if (opsi == 2) {
-          String namaDaftar = editTabelForm(user: user, daftarBelanja: daftarBelanja);
-
-          await daftarBelanja.update(namaDaftar);
-        } else if (opsi == 3) {
-          await daftarBelanja.delete();
-          return;
-        } else if (opsi == 4) {
-          return;
-        } else if (opsi == 5) {
-          List<Map<String, dynamic>> daftarSeller = await Seller.getAllSeller();
-
-          List? data = await selectSeller(user, daftarSeller);
-
-          if (data != null) {
-            await selectBarangFromSellerRoutine(user, daftarBelanja, data[0], data[1]);
-          }
-        }
-      }
-    }
-}
-
-Future<void> selectBarangFromSellerRoutine(CommonUser user, DaftarBelanja daftarBelanja, Seller seller, DaftarProduk daftarProduk) async {
+Future<bool> selectBarangFromSellerRoutine(CommonUser user, DaftarBelanja daftarBelanja, Seller seller, DaftarProduk daftarProduk) async {
   while (true) {
     Barang? barang = await selectBarangFromSeller(user, seller, daftarProduk);
 
     if (barang != null) {
-      List dataBarang = detailBarangFromSeller(user, barang);
+      List? dataBarang = detailBarangFromSeller(user, barang);
 
-      if (dataBarang.isEmpty) {
-        return;
-      } else {
-        await daftarBelanja.tambahBarang(dataBarang[0], dataBarang[1], dataBarang[2], dataBarang[3], dataBarang[4], dataBarang[5]);
-        return;
+      if (dataBarang != null) {
+        bool hasil = await daftarBelanja.tambahBarang(dataBarang[0], dataBarang[1], dataBarang[2], dataBarang[3], dataBarang[4], dataBarang[5]);
+        if (!hasil) {
+          throw(Exception("Gagal Menambahkan Barang"));
+        }
+        return true;
       }
+    } else {
+      return false;
     }
   }
 }
 
 Future<void> showSpesificBarangRoutine({CommonUser? user, Seller? seller, required Barang barang}) async {
     if (user != null) {
-      int? opsi;
       while (true) {
-        opsi = spesificBarang(barang: barang, user: user);
-
+        String? err;
+        int opsi = spesificBarang(user, barang, err);
 
         if (opsi == 0) {
-          List data = updateDataBarangForm(barang: barang, user: user);
+          List data = updateDataBarangForm(user, barang);
 
-          await barang.update(data[0], data[1], data[2], data[3], data[4], data[5]);
+          try {
+            await barang.update(data[0], data[1], data[2], data[3], data[4], data[5]);
+          } catch (e) {
+            err = e.toString();
+            continue;
+          }
 
         } else if (opsi == 1) {
-          if (await barang.delete()) {
-            return;
+          try {
+            if (await barang.delete()) {
+              return;
+            }
+          } catch (e) {
+            err = e.toString();
+            continue;
           }
         } else if (opsi == 2) {
           return;
         }
       }
     } else if (seller != null) {
-      int? opsi;
       while (true) {
-        opsi = spesificBarang(barang: barang, seller: seller);
+        String? err;
+        int opsi = spesificBarang(seller, barang, err);
 
 
         if (opsi == 0) {
-          List data = updateDataBarangForm(barang: barang, seller: seller);
+          List data = updateDataBarangForm(seller, barang);
 
-          await barang.update(data[0], data[1], data[2], data[3], data[4], data[5]);
+          try {
+            await barang.update(data[0], data[1], data[2], data[3], data[4], data[5]);
+          } catch (e) {
+            err = e.toString();
+            continue;
+          }
 
         } else if (opsi == 1) {
-          if (await barang.delete()) {
-            return;
+          try {
+            if (await barang.delete()) {
+              return;
+            }
+          } catch (e) {
+            err = e.toString();
+            continue;
           }
         } else if (opsi == 2) {
           return;

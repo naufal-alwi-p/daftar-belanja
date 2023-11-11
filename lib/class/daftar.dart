@@ -11,21 +11,32 @@ abstract class Daftar {
   String get namaDaftar => _namaDaftar!;
 
   Daftar();
-  Daftar.init(this._idDaftar, this._namaDaftar, this._dateCreated, this._dateUpdated);
+  Daftar.init(int idDaftar, String namaDaftar, String dateCreated, String dateUpdated) {
+    _idDaftar = idDaftar;
+    _namaDaftar = namaDaftar;
+    _dateCreated = _dateParse(DateTime.parse(dateCreated));
+    _dateUpdated = _dateParse(DateTime.parse(dateUpdated));
+  }
 
   Future<List<Barang>> getAllBarang();
   Future<bool> tambahBarang(String nama, int harga, String deskripsi, String kategori, int kuantitas, [String? url]);
-  Future<bool> update( String nama);
+  Future<bool> update(String nama);
   Future<bool> delete();
 
   List getAttributes() {
     return [_namaDaftar, _dateCreated, _dateUpdated];
   }
+
+  String _dateParse(DateTime time) {
+    List<String> bulan = ['Januari' , 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    return "${time.day} ${bulan[time.month - 1]} ${time.year} ${time.hour}:${time.minute}:${time.second}";
+  }
 }
 
 class DaftarBelanja extends Daftar {
   DaftarBelanja();
-  DaftarBelanja.init(int? idDaftar, String? namaDaftar, String? dateCreated, String? dateUpdated) : super.init(idDaftar, namaDaftar, dateCreated, dateUpdated);
+  DaftarBelanja.init(int idDaftar, String namaDaftar, String dateCreated, String dateUpdated) : super.init(idDaftar, namaDaftar, dateCreated, dateUpdated);
 
   @override
   Future<List<Barang>> getAllBarang() async {
@@ -54,9 +65,14 @@ class DaftarBelanja extends Daftar {
       [nama, harga, deskripsi, kategori, kuantitas, url, _idDaftar]
     );
 
+    DateTime update = DateTime.now();
+
+    Results hasil2 = await koneksi.query("UPDATE daftar_barang SET date_updated = ? WHERE id = ?", [update.toIso8601String(), _idDaftar]);
+
     await koneksi.close();
 
-    if (hasil.insertId != null) {
+    if (hasil.insertId != null && hasil2.affectedRows == 1) {
+      _dateUpdated = _dateParse(update);
       return true;
     } else {
       return false;
@@ -92,7 +108,7 @@ class DaftarBelanja extends Daftar {
 
         if (hasil.affectedRows == 1) {
             _namaDaftar = nama;
-            _dateUpdated = date.fields[0].toString();
+            _dateUpdated = _dateParse(DateTime.parse(date.fields[0].toString()));
 
             return true;
         } else if (hasil.affectedRows == 0) {
@@ -131,7 +147,7 @@ class DaftarBelanja extends Daftar {
 
 class DaftarProduk extends Daftar {
   DaftarProduk();
-  DaftarProduk.init(int? idDaftar, String? namaDaftar, String? dateCreated, String? dateUpdated) : super.init(idDaftar, namaDaftar, dateCreated, dateUpdated);
+  DaftarProduk.init(int idDaftar, String namaDaftar, String dateCreated, String dateUpdated) : super.init(idDaftar, namaDaftar, dateCreated, dateUpdated);
 
   @override
   Future<List<Barang>> getAllBarang() async {
@@ -160,9 +176,14 @@ class DaftarProduk extends Daftar {
       [nama, harga, deskripsi, kategori, kuantitas, url, _idDaftar]
     );
 
+    DateTime update = DateTime.now();
+
+    Results hasil2 = await koneksi.query("UPDATE daftar_barang SET date_updated = ? WHERE id = ?", [update.toIso8601String(), _idDaftar]);
+
     await koneksi.close();
 
-    if (hasil.insertId != null) {
+    if (hasil.insertId != null && hasil2.affectedRows == 0) {
+      _dateUpdated = _dateParse(update);
       return true;
     } else {
       return false;
@@ -186,7 +207,7 @@ class DaftarProduk extends Daftar {
 
         if (hasil.affectedRows == 1) {
             _namaDaftar = nama;
-            _dateUpdated = date.fields[0].toString();
+            _dateUpdated = _dateParse(DateTime.parse(date.fields[0].toString()));
 
             return true;
         } else if (hasil.affectedRows == 0) {
