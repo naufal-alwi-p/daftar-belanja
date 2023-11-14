@@ -270,10 +270,10 @@ int showProfile(User user, {String? error}) {
 
     print(tabel);
 
-    opsi = Select(prompt: 'Opsi', options: ["Kembali", "Logout", "Hapus Akun"])
+    opsi = Select(prompt: 'Opsi', options: ["Kembali", "Edit Profile", "Logout", "Hapus Akun"])
         .interact();
 
-    if (opsi == 1 || opsi == 2) {
+    if (opsi == 2 || opsi == 3) {
       confirmation = Confirm(prompt: "Apakah Kamu Yakin?", waitForNewLine: true)
           .interact();
     } else {
@@ -284,6 +284,113 @@ int showProfile(User user, {String? error}) {
   }
 
   return opsi;
+}
+
+List updateProfileForm(User user) {
+  late String nama, nomorTelepon, alamat, email, oldPassword, newPassword;
+  String? namaToko;
+  bool? confirmationSubmit;
+  late bool confirmationChangePassword;
+
+  Map<String, dynamic> data = user.getAllAttributes();
+
+  while (confirmationSubmit != true) {
+    header("Update Account Profile");
+
+    nama = Input(
+        prompt: "Nama:",
+        validator: (nama) {
+          if (validator.isAlpha(validator.blacklist(nama, ' '))) {
+            return true;
+          } else {
+            throw (ValidationError("Nama Harus Terdiri dari huruf saja"));
+          }
+        },
+        initialText: data["Nama"]
+        ).interact();
+
+    if (user.runtimeType == Seller) {
+      namaToko = Input(
+        prompt: "Nama Toko:",
+        validator: (namaToko) {
+          if (namaToko == '') {
+            throw(ValidationError("Nama Toko Wajib Diisi"));
+          } else {
+            return true;
+          }
+        },
+        initialText: data["Nama Toko"]
+      ).interact();
+    }
+
+    nomorTelepon = Input(
+        prompt: "Nomor Telepon:",
+        validator: (nomorTelepon) {
+          if (validator.isNumeric(nomorTelepon)) {
+            return true;
+          } else {
+            throw (ValidationError("Isikan Nomor Telepon"));
+          }
+        },
+        initialText: data["Nomor Telepon"]
+        ).interact();
+
+    alamat = Input(
+        prompt: "Alamat:",
+        validator: (alamat) {
+          if (validator.isAscii(alamat)) {
+            return true;
+          } else {
+            throw (ValidationError("Isi Alamat Dengan Benar !"));
+          }
+        },
+        initialText: data["Alamat"]
+        ).interact();
+
+    email = Input(
+        prompt: "Email:",
+        validator: (email) {
+          if (validator.isEmail(email)) {
+            return true;
+          } else {
+            throw (ValidationError("Isi email dengan benar !"));
+          }
+        },
+        initialText: data["Email"]
+        ).interact();
+
+    oldPassword = Password(prompt: "Password:").interact();
+
+    confirmationChangePassword = Confirm(prompt: "Ubah Password ?", waitForNewLine: true).interact();
+
+    if (confirmationChangePassword) {
+      console.writeLine("");
+
+      newPassword = Password(
+        prompt: "Masukkan Password Baru:",
+        confirmation: true,
+        confirmPrompt: "Konfirmasi Password Baru:"
+      ).interact();
+
+      console.writeLine("");
+    }
+
+    confirmationSubmit = Confirm(prompt: "Submit?", waitForNewLine: true).interact();
+
+    if (confirmationSubmit != true) {
+      console.clearScreen();
+    }
+  }
+
+  console.clearScreen();
+
+  List<String?> result = [nama, oldPassword, nomorTelepon, alamat, email];
+
+  result.add((confirmationChangePassword) ? newPassword : null);
+
+  result.add((namaToko == null) ? null : namaToko);
+
+  return result;
 }
 
 String buatDaftarBelanjaForm() {

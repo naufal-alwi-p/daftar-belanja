@@ -15,7 +15,7 @@ abstract class User {
 
   Future<dynamic> createAccount(String nama, String password, String nomorTelepon, String alamat, String email);
   Future<dynamic> login(String email, String password);
-  // Future<dynamic> update(String nama, String password, String nomorTelepon, String alamat, String email); (Tambahkkan Fitur Ini)
+  Future<bool> update(String nama, String oldPassword, String nomorTelepon, String alamat, String email, [String? newPassword]);
   Future<bool> deleteAccount();
   bool logOut();
 
@@ -89,6 +89,46 @@ class CommonUser extends User {
       throw(Exception("Gagal Login!"));
     } else {
       throw(Exception("Ada Kesalahan!"));
+    }
+  }
+
+  @override
+  Future<bool> update(String nama, String oldPassword, String nomorTelepon, String alamat, String email, [String? newPassword]) async {
+    if (_userId == null && _nama == null && _nomorTelepon == null && _alamat == null && _email == null) {
+      throw(Exception("Status Sudah Tidak Login !"));
+    } else {
+        MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
+
+        Results passwordFromDB = await koneksi.query("SELECT password FROM users WHERE user_id = ?", [_userId]);
+
+        if (passwordFromDB.length == 1) {
+            if (passwordFromDB.first.first != oldPassword) {
+                throw("Gagal Update Profil Akun");
+            }
+        } else {
+            throw(Exception("Ada Kesalahan!"));
+        }
+
+        String password = (newPassword == null) ? oldPassword : newPassword;
+
+        Results hasil = await koneksi.query("UPDATE users SET name = ?, nomor_telepon = ?, alamat = ?, email = ?, password = ? WHERE user_id = ?",
+            [nama, nomorTelepon, alamat, email, password, _userId]
+        );
+
+        await koneksi.close();
+
+        if (hasil.affectedRows == 1) {
+            _nama = nama;
+            _nomorTelepon = nomorTelepon;
+            _alamat = alamat;
+            _email = email;
+
+            return true;
+        } else if (hasil.affectedRows == 0) {
+            throw(Exception("Tidak Menemukan User yang Ingin Di Update !"));
+        } else {
+            throw(Exception("Ada Kesalahan!"));
+        }
     }
   }
 
@@ -250,6 +290,47 @@ class Seller extends User {
       throw(Exception("Gagal Login!"));
     } else {
       throw(Exception("Ada Kesalahan!"));
+    }
+  }
+
+  @override
+  Future<bool> update(String nama, String oldPassword, String nomorTelepon, String alamat, String email, [String? newPassword, String? namaToko]) async {
+    if (_userId == null && _nama == null && _namaToko == null && _nomorTelepon == null && _alamat == null && _email == null) {
+      throw(Exception("Status Sudah Tidak Login !"));
+    } else {
+        MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
+
+        Results passwordFromDB = await koneksi.query("SELECT password FROM users WHERE user_id = ?", [_userId]);
+
+        if (passwordFromDB.length == 1) {
+            if (passwordFromDB.first.first != oldPassword) {
+                throw("Gagal Update Profil Akun");
+            }
+        } else {
+            throw(Exception("Ada Kesalahan!"));
+        }
+
+        String password = (newPassword == null) ? oldPassword : newPassword;
+
+        Results hasil = await koneksi.query("UPDATE users SET name = ?, nama_toko = ?, nomor_telepon = ?, alamat = ?, email = ?, password = ? WHERE user_id = ?",
+            [nama, namaToko, nomorTelepon, alamat, email, password, _userId]
+        );
+
+        await koneksi.close();
+
+        if (hasil.affectedRows == 1) {
+            _nama = nama;
+            _namaToko = namaToko;
+            _nomorTelepon = nomorTelepon;
+            _alamat = alamat;
+            _email = email;
+
+            return true;
+        } else if (hasil.affectedRows == 0) {
+            throw(Exception("Tidak Menemukan User yang Ingin Di Update !"));
+        } else {
+            throw(Exception("Ada Kesalahan!"));
+        }
     }
   }
 

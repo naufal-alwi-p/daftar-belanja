@@ -27,9 +27,15 @@ class Barang {
         [nama, harga, deskripsi, kategori, kuantitas, url, _idBarang]
       );
 
+      DateTime update = DateTime.now();
+
+      Results hasil2 = await koneksi.query("UPDATE daftar_barang SET daftar_barang.date_updated = ? WHERE daftar_barang.id = (SELECT barang.daftar_id FROM barang WHERE barang.id = ?)",
+        [update.toIso8601String(), _idBarang]
+      );
+
       await koneksi.close();
 
-      if (hasil.affectedRows == 1) {
+      if (hasil.affectedRows == 1 && hasil2.affectedRows == 1) {
         _nama = nama;
         _harga = harga;
         _deskripsi = deskripsi;
@@ -53,10 +59,16 @@ class Barang {
       MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
 
       Results hasil = await koneksi.query("DELETE FROM barang WHERE id = ?", [_idBarang]);
+      
+      DateTime update = DateTime.now();
+
+      Results hasil2 = await koneksi.query("UPDATE daftar_barang SET daftar_barang.date_updated = ? WHERE daftar_barang.id = (SELECT barang.daftar_id FROM barang WHERE barang.id = ?)",
+        [update.toIso8601String(), _idBarang]
+      );
 
       await koneksi.close();
 
-      if (hasil.affectedRows == 1) {
+      if (hasil.affectedRows == 1 && hasil2.affectedRows == 1) {
         _idBarang = _nama = _harga = _deskripsi = _kategori = _kuantitas = _url = null;
 
         return true;

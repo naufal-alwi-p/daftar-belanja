@@ -133,7 +133,7 @@ Future<void> homepageRoutine({CommonUser? user, Seller? seller, DaftarProduk? da
           continue;
         }
       } else if (opsi == 2) {
-        if (await showMyProfileRoutine(user)) {
+        if (await showMyProfileRoutine(user: user)) {
           return;
         }
       }
@@ -164,7 +164,7 @@ Future<void> homepageRoutine({CommonUser? user, Seller? seller, DaftarProduk? da
           await showSpesificBarangRoutine(barang: barang, seller: seller);
         }
       } else if (opsi == 2) {
-        if (await showMyProfileRoutine(seller)) {
+        if (await showMyProfileRoutine(seller: seller)) {
           return;
         }
       }
@@ -172,32 +172,81 @@ Future<void> homepageRoutine({CommonUser? user, Seller? seller, DaftarProduk? da
   }
 }
 
-Future<bool> showMyProfileRoutine(User user) async {
-  while (true) {
-    String? err;
-    int opsi = showProfile(user, error: err);
+Future<bool> showMyProfileRoutine({CommonUser? user, Seller? seller}) async {
+  if (user != null) {
+    while (true) {
+      String? err;
+      int opsi = showProfile(user, error: err);
 
-    if (opsi == 0) {
-      return false;
-    } else if (opsi == 1) {
-      try {
-        if (user.logOut()) {
-          return true;
+      if (opsi == 0) {
+        return false;
+      } else if (opsi == 1) {
+        List data = updateProfileForm(user);
+
+        try {
+          await user.update(data[0], data[1], data[2], data[3], data[4], data[5]);
+        } catch (e) {
+          err = e.toString();
+          continue;
         }
-      } catch (e) {
-        err = e.toString();
-        continue;
-      }
-    } else if (opsi == 2) {
-      try {
-        if (await user.deleteAccount()) {
-          return true;
+      } else if (opsi == 2) {
+        try {
+          if (user.logOut()) {
+            return true;
+          }
+        } catch (e) {
+          err = e.toString();
+          continue;
         }
-      } catch (e) {
-        err = e.toString();
-        continue;
+      } else if (opsi == 3) {
+        try {
+          if (await user.deleteAccount()) {
+            return true;
+          }
+        } catch (e) {
+          err = e.toString();
+          continue;
+        }
       }
     }
+  } else if (seller != null) {
+    while (true) {
+      String? err;
+      int opsi = showProfile(seller, error: err);
+
+      if (opsi == 0) {
+        return false;
+      } else if (opsi == 1) {
+        List data = updateProfileForm(seller);
+
+        try {
+          await seller.update(data[0], data[1], data[2], data[3], data[4], data[5], data[6]);
+        } catch (e) {
+          err = e.toString();
+          continue;
+        }
+      } else if (opsi == 2) {
+        try {
+          if (seller.logOut()) {
+            return true;
+          }
+        } catch (e) {
+          err = e.toString();
+          continue;
+        }
+      } else if (opsi == 3) {
+        try {
+          if (await seller.deleteAccount()) {
+            return true;
+          }
+        } catch (e) {
+          err = e.toString();
+          continue;
+        }
+      }
+    }
+  } else {
+    return false;
   }
 }
 
