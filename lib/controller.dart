@@ -156,7 +156,6 @@ Future<void> homepageRoutine({CommonUser? user, Seller? seller, DaftarProduk? da
           err = e.toString();
           continue;
         }
-
       } else if (opsi == 1) {
         Barang? barang = await selectDetailBarang(seller: seller, daftarProduk: daftarProduk);
 
@@ -270,7 +269,7 @@ Future<void> showSpesificListRoutine(CommonUser user, DaftarBelanja daftarBelanj
         bool hasil = await daftarBelanja.tambahBarang(data[0], data[1], data[2], data[3], data[4], data[5]);
 
         if (!hasil) {
-          throw(Exception("Gagal Menambahkan Barang"));
+          throw (Exception("Gagal Menambahkan Barang"));
         }
       } catch (e) {
         err = e.toString();
@@ -299,7 +298,6 @@ Future<void> showSpesificListRoutine(CommonUser user, DaftarBelanja daftarBelanj
         err = e.toString();
         continue;
       }
-      
     } else if (opsi == 4) {
       return;
     } else if (opsi == 5) {
@@ -335,7 +333,7 @@ Future<bool> selectBarangFromSellerRoutine(CommonUser user, DaftarBelanja daftar
       if (dataBarang != null) {
         bool hasil = await daftarBelanja.tambahBarang(dataBarang[0], dataBarang[1], dataBarang[2], dataBarang[3], dataBarang[4], dataBarang[5]);
         if (!hasil) {
-          throw(Exception("Gagal Menambahkan Barang"));
+          throw (Exception("Gagal Menambahkan Barang"));
         }
         return true;
       }
@@ -346,62 +344,59 @@ Future<bool> selectBarangFromSellerRoutine(CommonUser user, DaftarBelanja daftar
 }
 
 Future<void> showSpesificBarangRoutine({CommonUser? user, Seller? seller, required Barang barang}) async {
-    if (user != null) {
-      while (true) {
-        String? err;
-        int opsi = spesificBarang(user, barang, err);
+  if (user != null) {
+    while (true) {
+      String? err;
+      int opsi = spesificBarang(user, barang, err);
 
-        if (opsi == 0) {
-          List data = updateDataBarangForm(user, barang);
+      if (opsi == 0) {
+        List data = updateDataBarangForm(user, barang);
 
-          try {
-            await barang.update(data[0], data[1], data[2], data[3], data[4], data[5]);
-          } catch (e) {
-            err = e.toString();
-            continue;
-          }
-
-        } else if (opsi == 1) {
-          try {
-            if (await barang.delete()) {
-              return;
-            }
-          } catch (e) {
-            err = e.toString();
-            continue;
-          }
-        } else if (opsi == 2) {
-          return;
+        try {
+          await barang.update(data[0], data[1], data[2], data[3], data[4], data[5]);
+        } catch (e) {
+          err = e.toString();
+          continue;
         }
-      }
-    } else if (seller != null) {
-      while (true) {
-        String? err;
-        int opsi = spesificBarang(seller, barang, err);
-
-
-        if (opsi == 0) {
-          List data = updateDataBarangForm(seller, barang);
-
-          try {
-            await barang.update(data[0], data[1], data[2], data[3], data[4], data[5]);
-          } catch (e) {
-            err = e.toString();
-            continue;
+      } else if (opsi == 1) {
+        try {
+          if (await barang.delete()) {
+            return;
           }
-
-        } else if (opsi == 1) {
-          try {
-            if (await barang.delete()) {
-              return;
-            }
-          } catch (e) {
-            err = e.toString();
-            continue;
-          }
-        } else if (opsi == 2) {
-          return;
+        } catch (e) {
+          err = e.toString();
+          continue;
         }
+      } else if (opsi == 2) {
+        return;
       }
     }
+  } else if (seller != null) {
+    while (true) {
+      String? err;
+      int opsi = spesificBarang(seller, barang, err);
+
+      if (opsi == 0) {
+        List data = updateDataBarangForm(seller, barang);
+
+        try {
+          await barang.update(data[0], data[1], data[2], data[3], data[4], data[5]);
+        } catch (e) {
+          err = e.toString();
+          continue;
+        }
+      } else if (opsi == 1) {
+        try {
+          if (await barang.delete()) {
+            return;
+          }
+        } catch (e) {
+          err = e.toString();
+          continue;
+        }
+      } else if (opsi == 2) {
+        return;
+      }
+    }
+  }
 }

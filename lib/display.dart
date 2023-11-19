@@ -61,15 +61,15 @@ List loginPage() {
     header("Login Form");
 
     email = Input(
-      prompt: "Email:",
-      validator: (email) {
+        prompt: "Email:",
+        validator: (email) {
           if (validator.isEmail(email)) {
             return true;
           } else {
             throw (ValidationError("Isi email dengan benar !"));
           }
-        }
-    ).interact();
+        }).interact();
+        
     password = Password(prompt: "Password:").interact();
 
     confirmation = Confirm(prompt: "Submit?", waitForNewLine: true).interact();
@@ -108,15 +108,14 @@ List createAccountPage(User user) {
 
     if (user.runtimeType == Seller) {
       namaToko = Input(
-        prompt: "Nama Toko:",
-        validator: (namaToko) {
-          if (namaToko == '') {
-            throw(ValidationError("Nama Toko Wajib Diisi"));
-          } else {
-            return true;
-          }
-        }
-      ).interact();
+          prompt: "Nama Toko:",
+          validator: (namaToko) {
+            if (namaToko == '') {
+              throw (ValidationError("Nama Toko Wajib Diisi"));
+            } else {
+              return true;
+            }
+          }).interact();
     }
 
     nomorTelepon = Input(
@@ -196,7 +195,7 @@ Future<int> homepage({CommonUser? user, Seller? seller, DaftarProduk? daftarProd
     for (DaftarBelanja daftar in daftarBelanja) {
       List row = daftar.getAttributes();
 
-      tabel.insertRow([index++,row[0], row[1], row[2]]);
+      tabel.insertRow([index++, row[0], row[1], row[2]]);
     }
   } else if (seller != null && daftarProduk != null) {
     tabel
@@ -254,7 +253,6 @@ int showProfile(User user, {String? error}) {
     ..insertColumn()
     ..insertColumn();
 
-  
   user.getAllAttributes().forEach((key, value) {
     tabel.insertRow([key, value]);
   });
@@ -270,8 +268,9 @@ int showProfile(User user, {String? error}) {
 
     print(tabel);
 
-    opsi = Select(prompt: 'Opsi', options: ["Kembali", "Edit Profile", "Logout", "Hapus Akun"])
-        .interact();
+    opsi = Select(
+            prompt: 'Opsi',
+            options: ["Kembali", "Edit Profile", "Logout", "Hapus Akun"]).interact();
 
     if (opsi == 2 || opsi == 3) {
       confirmation = Confirm(prompt: "Apakah Kamu Yakin?", waitForNewLine: true)
@@ -298,66 +297,61 @@ List updateProfileForm(User user) {
     header("Update Account Profile");
 
     nama = Input(
-        prompt: "Nama:",
-        validator: (nama) {
-          if (validator.isAlpha(validator.blacklist(nama, ' '))) {
-            return true;
-          } else {
-            throw (ValidationError("Nama Harus Terdiri dari huruf saja"));
-          }
-        },
-        initialText: data["Nama"]
-        ).interact();
+            prompt: "Nama:",
+            validator: (nama) {
+              if (validator.isAlpha(validator.blacklist(nama, ' '))) {
+                return true;
+              } else {
+                throw (ValidationError("Nama Harus Terdiri dari huruf saja"));
+              }
+            },
+            initialText: data["Nama"]).interact();
 
     if (user.runtimeType == Seller) {
       namaToko = Input(
-        prompt: "Nama Toko:",
-        validator: (namaToko) {
-          if (namaToko == '') {
-            throw(ValidationError("Nama Toko Wajib Diisi"));
-          } else {
-            return true;
-          }
-        },
-        initialText: data["Nama Toko"]
-      ).interact();
+              prompt: "Nama Toko:",
+              validator: (namaToko) {
+                if (namaToko == '') {
+                  throw (ValidationError("Nama Toko Wajib Diisi"));
+                } else {
+                  return true;
+                }
+              },
+              initialText: data["Nama Toko"]).interact();
     }
 
     nomorTelepon = Input(
-        prompt: "Nomor Telepon:",
-        validator: (nomorTelepon) {
-          if (validator.isNumeric(nomorTelepon)) {
-            return true;
-          } else {
-            throw (ValidationError("Isikan Nomor Telepon"));
-          }
-        },
-        initialText: data["Nomor Telepon"]
-        ).interact();
+            prompt: "Nomor Telepon:",
+            validator: (nomorTelepon) {
+              if (validator.isNumeric(nomorTelepon)) {
+                return true;
+              } else {
+                throw (ValidationError("Isikan Nomor Telepon"));
+              }
+            },
+            initialText: data["Nomor Telepon"]).interact();
 
     alamat = Input(
-        prompt: "Alamat:",
-        validator: (alamat) {
-          if (validator.isAscii(alamat)) {
-            return true;
-          } else {
-            throw (ValidationError("Isi Alamat Dengan Benar !"));
-          }
-        },
-        initialText: data["Alamat"]
-        ).interact();
+            prompt: "Alamat:",
+            validator: (alamat) {
+              if (validator.isAscii(alamat)) {
+                return true;
+              } else {
+                throw (ValidationError("Isi Alamat Dengan Benar !"));
+              }
+            },
+            initialText: data["Alamat"]).interact();
 
     email = Input(
-        prompt: "Email:",
-        validator: (email) {
-          if (validator.isEmail(email)) {
-            return true;
-          } else {
-            throw (ValidationError("Isi email dengan benar !"));
-          }
-        },
-        initialText: data["Email"]
-        ).interact();
+            prompt: "Email:",
+            validator: (email) {
+              if (validator.isEmail(email)) {
+                return true;
+              } else {
+                throw (ValidationError("Isi email dengan benar !"));
+              }
+            },
+            initialText: data["Email"]).interact();
 
     oldPassword = Password(prompt: "Password:").interact();
 
@@ -367,10 +361,9 @@ List updateProfileForm(User user) {
       console.writeLine("");
 
       newPassword = Password(
-        prompt: "Masukkan Password Baru:",
-        confirmation: true,
-        confirmPrompt: "Konfirmasi Password Baru:"
-      ).interact();
+              prompt: "Masukkan Password Baru:",
+              confirmation: true,
+              confirmPrompt: "Konfirmasi Password Baru:").interact();
 
       console.writeLine("");
     }
@@ -463,65 +456,74 @@ Future<int> spesificList(CommonUser user, DaftarBelanja daftarBelanja, String? e
     ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
     ..insertColumn(header: "URL", alignment: TextAlignment.center);
 
-    List<Barang> listBarang = await daftarBelanja.getAllBarang();
-    int index = 1;
-    int totalHarga = await daftarBelanja.hitungTotalHarga();
-    bool? confirmation;
-    late int hasil;
+  List<Barang> listBarang = await daftarBelanja.getAllBarang();
+  int index = 1;
+  int totalHarga = await daftarBelanja.hitungTotalHarga();
+  bool? confirmation;
+  late int hasil;
 
-    for (Barang barang in listBarang) {
-      Map data = barang.showDetail();
+  for (Barang barang in listBarang) {
+    Map data = barang.showDetail();
 
-      List<Object> row = [
-        index++,
-        data['Nama'],
-        data['Harga'],
-        data['Kategori'],
-        data['Kuantitas'],
-        data['URL'].toString()
-      ];
+    List<Object> row = [
+      index++,
+      data['Nama'],
+      data['Harga'],
+      data['Kategori'],
+      data['Kuantitas'],
+      data['URL'].toString()
+    ];
 
-      tabel.insertRow(row);
+    tabel.insertRow(row);
+  }
+
+  while (confirmation != true) {
+    header("Daftar Belanja", loggedUser: user.nama, error: err);
+
+    print(tabel);
+
+    console.setTextStyle(bold: true);
+    console.setForegroundColor(ConsoleColor.blue);
+    console.write("Total Harga: Rp ");
+    console.setTextStyle(bold: false);
+    console.resetColorAttributes();
+    console.writeLine(totalHarga);
+
+    List<String> opsi = [
+      "Tambah Barang",
+      "Lihat Detail Barang",
+      "Edit Tabel",
+      "Hapus Tabel",
+      "Kembali"
+    ];
+
+    hasil = Select(prompt: "Opsi", options: opsi).interact();
+
+    if (hasil == 0) {
+      confirmation = Confirm(
+              prompt: "Cari Barang dari Seller atau Input Sendiri?",
+              waitForNewLine: true).interact();
+
+      if (confirmation) {
+        hasil = 5;
+      }
+      confirmation = true;
+    } else if (hasil == 3) {
+      confirmation = Confirm(
+              prompt: "Apakah Kamu Yakin? Semua List Barang Kamu Akan Terhapus",
+              waitForNewLine: true).interact();
+    } else {
+      confirmation = true;
     }
 
-    while (confirmation != true) {
-      header("Daftar Belanja", loggedUser: user.nama, error: err);
-
-      print(tabel);
-
-      console.setTextStyle(bold: true);
-      console.setForegroundColor(ConsoleColor.blue);
-      console.write("Total Harga: Rp ");
-      console.setTextStyle(bold: false);
-      console.resetColorAttributes();
-      console.writeLine(totalHarga);
-
-      List<String> opsi = ["Tambah Barang", "Lihat Detail Barang", "Edit Tabel", "Hapus Tabel", "Kembali"];
-
-      hasil = Select(prompt: "Opsi", options: opsi).interact();
-
-      if (hasil == 0) {
-        confirmation = Confirm(prompt: "Cari Barang dari Seller atau Input Sendiri?", waitForNewLine: true).interact();
-
-        if (confirmation) {
-          hasil = 5;
-        }
-        confirmation = true;
-
-      } else if (hasil == 3) {
-        confirmation = Confirm(prompt: "Apakah Kamu Yakin? Semua List Barang Kamu Akan Terhapus", waitForNewLine: true).interact();
-      } else {
-        confirmation = true;
-      }
-
-      if (confirmation == false) {
-        console.clearScreen();
-      }
+    if (confirmation == false) {
+      console.clearScreen();
     }
+  }
 
-    console.clearScreen();
+  console.clearScreen();
 
-    return hasil;
+  return hasil;
 }
 
 List tambahBarangForm({CommonUser? user, Seller? seller}) {
@@ -581,10 +583,11 @@ List tambahBarangForm({CommonUser? user, Seller? seller}) {
         console.clearScreen();
       }
     }
-  } if (seller != null) {
+  }
+  if (seller != null) {
     while (confirmationSubmit != true) {
       header("Tambah Produk Form", loggedUser: seller.nama);
-      
+
       nama = Input(prompt: "Nama Produk:").interact();
 
       harga = Input(
@@ -618,9 +621,9 @@ List tambahBarangForm({CommonUser? user, Seller? seller}) {
 
       angkaKuantitas = int.parse(kuantitas);
 
-      confirmationUrl =
-          Confirm(prompt: "Apakah produk anda tersedia secara online?", waitForNewLine: true)
-              .interact();
+      confirmationUrl = Confirm(
+              prompt: "Apakah produk anda tersedia secara online?",
+              waitForNewLine: true).interact();
 
       if (confirmationUrl) {
         url = Input(prompt: "URL Produk").interact();
@@ -648,10 +651,7 @@ String editTabelForm({required CommonUser user, required DaftarBelanja daftarBel
   List data = daftarBelanja.getAttributes();
 
   while (confirmation != true) {
-    namaDaftar = Input(
-      prompt: "Nama Daftar:",
-      initialText: data[0]
-    ).interact();
+    namaDaftar = Input(prompt: "Nama Daftar:", initialText: data[0]).interact();
 
     confirmation = Confirm(prompt: "Submit?", waitForNewLine: true).interact();
 
@@ -676,7 +676,6 @@ Future<Barang?> selectDetailBarang({CommonUser? user, Seller? seller, DaftarBela
     ..insertColumn(header: "Kategori", alignment: TextAlignment.center)
     ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
     ..insertColumn(header: "URL", alignment: TextAlignment.center);
-
 
   late String pageName, userName;
   late List<Barang> listBarang;
@@ -799,7 +798,6 @@ int spesificBarang(User user, Barang barang, String? err) {
     if (confirmation == false) {
       console.clearScreen();
     }
-
   }
 
   console.clearScreen();
@@ -819,57 +817,46 @@ List updateDataBarangForm(User user, Barang barang) {
     while (confirmationSubmit != true) {
       header("Update Data Barang", loggedUser: user.nama);
 
-      nama = Input(
-        prompt: "Nama Barang:",
-        initialText: dataBarang['Nama']
-      ).interact();
+      nama = Input(prompt: "Nama Barang:", initialText: dataBarang['Nama']).interact();
 
       harga = Input(
-          prompt: "Harga Barang:",
-          validator: (harga) {
-            if (validator.isNumeric(harga)) {
-              return true;
-            } else {
-              throw (ValidationError("Isikan Angka"));
-            }
-          },
-          initialText: dataBarang['Harga'].toString()
-          ).interact();
+              prompt: "Harga Barang:",
+              validator: (harga) {
+                if (validator.isNumeric(harga)) {
+                  return true;
+                } else {
+                  throw (ValidationError("Isikan Angka"));
+                }
+              },
+              initialText: dataBarang['Harga'].toString()).interact();
 
       angkaHarga = int.parse(harga);
 
       deskripsi = Input(
-        prompt: "Deskripsi Barang",
-        initialText: (dataBarang['Deskripsi'] == 'null') ? '' : dataBarang['Deskripsi']
-      ).interact();
+              prompt: "Deskripsi Barang",
+              initialText: (dataBarang['Deskripsi'] == 'null') ? '' : dataBarang['Deskripsi']).interact();
 
       if (deskripsi == "") {
         deskripsi = null;
       }
 
-      kategori = Input(
-        prompt: "Kategori Barang",
-        initialText: dataBarang['Kategori']
-      ).interact();
+      kategori = Input(prompt: "Kategori Barang", initialText: dataBarang['Kategori']).interact();
 
       kuantitas = Input(
-          prompt: "Kuantitas Barang",
-          validator: (kuantitas) {
-            if (validator.isNumeric(kuantitas)) {
-              return true;
-            } else {
-              throw (ValidationError("Isikan Angka"));
-            }
-          },
-          initialText: dataBarang['Kuantitas'].toString()
-          ).interact();
+              prompt: "Kuantitas Barang",
+              validator: (kuantitas) {
+                if (validator.isNumeric(kuantitas)) {
+                  return true;
+                } else {
+                  throw (ValidationError("Isikan Angka"));
+                }
+              },
+              initialText: dataBarang['Kuantitas'].toString()).interact();
 
       angkaKuantitas = int.parse(kuantitas);
 
       if (dataBarang['URL'] == 'null') {
-        confirmationUrl =
-            Confirm(prompt: "Apakah ini barang online?", waitForNewLine: true)
-                .interact();
+        confirmationUrl = Confirm(prompt: "Apakah ini barang online?", waitForNewLine: true).interact();
 
         if (confirmationUrl) {
           url = Input(prompt: "URL Barang").interact();
@@ -877,10 +864,7 @@ List updateDataBarangForm(User user, Barang barang) {
           url = (url == '') ? null : url;
         }
       } else {
-        url = Input(
-          prompt: "URL Barang",
-          initialText: dataBarang['URL']
-        ).interact();
+        url = Input(prompt: "URL Barang", initialText: dataBarang['URL']).interact();
 
         url = (url == '') ? null : url;
       }
@@ -891,62 +875,52 @@ List updateDataBarangForm(User user, Barang barang) {
         console.clearScreen();
       }
     }
-    
   } else if (user.runtimeType == Seller) {
     while (confirmationSubmit != true) {
       header("Update Data Produk", loggedUser: user.nama);
 
-      nama = Input(
-        prompt: "Nama Produk:",
-        initialText: dataBarang['Nama']
-      ).interact();
+      nama = Input(prompt: "Nama Produk:", initialText: dataBarang['Nama']).interact();
 
       harga = Input(
-          prompt: "Harga Produk:",
-          validator: (harga) {
-            if (validator.isNumeric(harga)) {
-              return true;
-            } else {
-              throw (ValidationError("Isikan Angka"));
-            }
-          },
-          initialText: dataBarang['Harga'].toString()
-          ).interact();
+              prompt: "Harga Produk:",
+              validator: (harga) {
+                if (validator.isNumeric(harga)) {
+                  return true;
+                } else {
+                  throw (ValidationError("Isikan Angka"));
+                }
+              },
+              initialText: dataBarang['Harga'].toString()).interact();
 
       angkaHarga = int.parse(harga);
 
       deskripsi = Input(
-        prompt: "Deskripsi Produk",
-        initialText: (dataBarang['Deskripsi'] == 'null') ? '' : dataBarang['Deskripsi']
-      ).interact();
+              prompt: "Deskripsi Produk",
+              initialText: (dataBarang['Deskripsi'] == 'null') ? '' : dataBarang['Deskripsi']).interact();
 
       if (deskripsi == "") {
         deskripsi = null;
       }
 
-      kategori = Input(
-        prompt: "Kategori Produk",
-        initialText: dataBarang['Kategori']
-      ).interact();
+      kategori = Input(prompt: "Kategori Produk", initialText: dataBarang['Kategori']).interact();
 
       kuantitas = Input(
-          prompt: "Stok Produk",
-          validator: (kuantitas) {
-            if (validator.isNumeric(kuantitas)) {
-              return true;
-            } else {
-              throw (ValidationError("Isikan Angka"));
-            }
-          },
-          initialText: dataBarang['Kuantitas'].toString()
-          ).interact();
+              prompt: "Stok Produk",
+              validator: (kuantitas) {
+                if (validator.isNumeric(kuantitas)) {
+                  return true;
+                } else {
+                  throw (ValidationError("Isikan Angka"));
+                }
+              },
+              initialText: dataBarang['Kuantitas'].toString()).interact();
 
       angkaKuantitas = int.parse(kuantitas);
 
       if (dataBarang['URL'] == 'null') {
-        confirmationUrl =
-            Confirm(prompt: "Apakah produk anda tersedia secara online?", waitForNewLine: true)
-                .interact();
+        confirmationUrl = Confirm(
+                prompt: "Apakah produk anda tersedia secara online?",
+                waitForNewLine: true).interact();
 
         if (confirmationUrl) {
           url = Input(prompt: "URL Produk").interact();
@@ -954,10 +928,7 @@ List updateDataBarangForm(User user, Barang barang) {
           url = (url == '') ? null : url;
         }
       } else {
-        url = Input(
-          prompt: "URL Produk",
-          initialText: dataBarang['URL']
-        ).interact();
+        url = Input(prompt: "URL Produk", initialText: dataBarang['URL']).interact();
 
         url = (url == '') ? null : url;
       }
@@ -968,7 +939,6 @@ List updateDataBarangForm(User user, Barang barang) {
         console.clearScreen();
       }
     }
-
   }
 
   console.clearScreen();
@@ -986,19 +956,23 @@ Future<List?> selectSeller(CommonUser user, List<Map<String, dynamic>> daftarSel
     ..insertColumn(header: "Nama Toko", alignment: TextAlignment.center)
     ..insertColumn(header: "No. Telepon", alignment: TextAlignment.center)
     ..insertColumn(header: "Alamat", alignment: TextAlignment.center);
-  
+
   List<String> opsi = [];
   int index = 1;
 
   for (Map<String, dynamic> seller in daftarSeller) {
-
     opsi.add("$index. ${seller['nama_toko']}");
 
-    tabel.insertRow([index++, seller['nama_toko'], seller['nomor_telepon'], seller['alamat']]);
+    tabel.insertRow([
+      index++,
+      seller['nama_toko'],
+      seller['nomor_telepon'],
+      seller['alamat']
+    ]);
   }
 
   opsi.add("Kembali");
-  
+
   header("Pilih Toko", loggedUser: user.nama);
 
   print(tabel);
@@ -1035,38 +1009,38 @@ Future<Barang?> selectBarangFromSeller(CommonUser user, Seller seller, DaftarPro
     ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
     ..insertColumn(header: "URL", alignment: TextAlignment.center);
 
-    List<Barang> listBarang = await daftarProduk.getAllBarang();
-    List<String> opsi = [];
-    int index = 1;
+  List<Barang> listBarang = await daftarProduk.getAllBarang();
+  List<String> opsi = [];
+  int index = 1;
 
-    for (Barang barang in listBarang) {
-      Map data = barang.showDetail();
+  for (Barang barang in listBarang) {
+    Map data = barang.showDetail();
 
-      opsi.add("$index. ${data['Nama']}");
+    opsi.add("$index. ${data['Nama']}");
 
-      List<Object> row = [
-        index++,
-        data['Nama'],
-        data['Harga'],
-        data['Kategori'],
-        data['Kuantitas'],
-        data['URL'].toString()
-      ];
+    List<Object> row = [
+      index++,
+      data['Nama'],
+      data['Harga'],
+      data['Kategori'],
+      data['Kuantitas'],
+      data['URL'].toString()
+    ];
 
-      tabel.insertRow(row);
-    }
+    tabel.insertRow(row);
+  }
 
-    opsi.add("Kembali");
+  opsi.add("Kembali");
 
-    header("Pilih Produk", loggedUser: user.nama);
+  header("Pilih Produk", loggedUser: user.nama);
 
-    print(tabel);
+  print(tabel);
 
-    int hasil = Select(prompt: "Pilih Produk", options: opsi).interact();
+  int hasil = Select(prompt: "Pilih Produk", options: opsi).interact();
 
-    console.clearScreen();
+  console.clearScreen();
 
-    return (hasil == (opsi.length - 1)) ? null : listBarang[hasil];
+  return (hasil == (opsi.length - 1)) ? null : listBarang[hasil];
 }
 
 List? detailBarangFromSeller(CommonUser user, Barang barang) {
@@ -1078,58 +1052,58 @@ List? detailBarangFromSeller(CommonUser user, Barang barang) {
     ..insertColumn()
     ..insertColumn();
 
-    Map<String, dynamic> data = barang.showDetail();
+  Map<String, dynamic> data = barang.showDetail();
 
-    bool? confirmation;
-    late int hasil;
-    late String kuantitas;
+  bool? confirmation;
+  late int hasil;
+  late String kuantitas;
 
-    data.forEach((key, value) {
-      tabel.insertRow([key, value.toString()]);
-    });
+  data.forEach((key, value) {
+    tabel.insertRow([key, value.toString()]);
+  });
 
-    while (confirmation != true) {
-      header("Detail Barang", loggedUser: user.nama);
+  while (confirmation != true) {
+    header("Detail Barang", loggedUser: user.nama);
 
-      print(tabel);
+    print(tabel);
 
-      hasil = Select(prompt: "Opsi", options: ["Pilih Produk Ini", "Kembali"]).interact();
+    hasil = Select(prompt: "Opsi", options: ["Pilih Produk Ini", "Kembali"]).interact();
 
-      if (hasil == 0) {
-        kuantitas = Input(
+    if (hasil == 0) {
+      kuantitas = Input(
           prompt: "Jumlah yang ingin dibeli:",
           validator: (kuantitas) {
             if (validator.isNumeric(kuantitas)) {
               int angka = int.parse(kuantitas);
 
               if (angka < 1) {
-                throw(ValidationError("Input minimal satu !"));
+                throw (ValidationError("Input minimal satu !"));
               }
 
               if (angka > data["Kuantitas"]) {
-                throw(ValidationError("Stok barang tidak mencukupi"));
+                throw (ValidationError("Stok barang tidak mencukupi"));
               }
 
               return true;
             } else {
-              throw(ValidationError("Input jumlah harus angka !"));
+              throw (ValidationError("Input jumlah harus angka !"));
             }
-          }
-        ).interact();
+          }).interact();
 
-        confirmation = Confirm(prompt: "Submit?", waitForNewLine: true).interact();
-      } else {
-        console.clearScreen();
+      confirmation =
+          Confirm(prompt: "Submit?", waitForNewLine: true).interact();
+    } else {
+      console.clearScreen();
 
-        return null;
-      }
-
-      if (confirmation == false) {
-        console.clearScreen();
-      }
+      return null;
     }
 
-    console.clearScreen();
+    if (confirmation == false) {
+      console.clearScreen();
+    }
+  }
 
-    return [data['Nama'], data['Harga'], data['Deskripsi'], data['Kategori'], int.parse(kuantitas), data["URL"]];
+  console.clearScreen();
+
+  return [data['Nama'], data['Harga'], data['Deskripsi'], data['Kategori'], int.parse(kuantitas), data["URL"]];
 }
