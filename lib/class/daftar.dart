@@ -319,4 +319,23 @@ class DaftarProduk extends Daftar {
       }
     }
   }
+
+  /// Mencari Produk
+  Future<List<Barang>> searchProduct(String keyword) async {
+    MySqlConnection koneksi = await MySqlConnection.connect(settingsDB);
+
+    Results hasil = await koneksi.query("SELECT * FROM barang WHERE daftar_id = ? AND nama LIKE '%$keyword%'", [_idDaftar]);
+
+    await koneksi.close();
+
+    List<Barang> listBarang = [];
+
+    for (var data in hasil) {
+      Barang barang = Barang(data[0], data[1], data[2], data[3].toString(), data[4], data[5], data[6].toString());
+
+      listBarang.add(barang);
+    }
+
+    return listBarang;
+  }
 }

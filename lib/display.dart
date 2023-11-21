@@ -181,7 +181,7 @@ Future<int> homepage({CommonUser? user, Seller? seller, DaftarProduk? daftarProd
     tabel
       ..title = "List Daftar Belanja"
       ..insertColumn(header: 'No.')
-      ..insertColumn(header: 'Nama Daftar', alignment: TextAlignment.center)
+      ..insertColumn(header: 'Nama Daftar', alignment: TextAlignment.center, width: 50)
       ..insertColumn(header: 'Date Created', alignment: TextAlignment.center)
       ..insertColumn(header: 'Date Update', alignment: TextAlignment.center);
 
@@ -200,12 +200,12 @@ Future<int> homepage({CommonUser? user, Seller? seller, DaftarProduk? daftarProd
   } else if (seller != null && daftarProduk != null) {
     tabel
       ..title = "Daftar Produk"
-      ..insertColumn(header: "No.")
-      ..insertColumn(header: "Nama", alignment: TextAlignment.center)
-      ..insertColumn(header: "Harga", alignment: TextAlignment.center)
-      ..insertColumn(header: "Kategori", alignment: TextAlignment.center)
-      ..insertColumn(header: "Stok", alignment: TextAlignment.center)
-      ..insertColumn(header: "URL", alignment: TextAlignment.center);
+      ..insertColumn(header: "No.", width: 10)
+      ..insertColumn(header: "Nama", alignment: TextAlignment.center, width: 50)
+      ..insertColumn(header: "Harga", alignment: TextAlignment.center, width: 10)
+      ..insertColumn(header: "Kategori", alignment: TextAlignment.center, width: 30)
+      ..insertColumn(header: "Stok", alignment: TextAlignment.center, width: 10)
+      ..insertColumn(header: "URL", alignment: TextAlignment.center, width: 50);
 
     pageName = "Seller Homepage";
     opsi = ["Tambah Produk", "Tampilkan Detail Produk", "Show My Profile"];
@@ -251,7 +251,7 @@ int showProfile(User user, {String? error}) {
     ..borderType = BorderType.grid
     ..showHeader = false
     ..insertColumn()
-    ..insertColumn();
+    ..insertColumn(width: 120);
 
   user.getAllAttributes().forEach((key, value) {
     tabel.insertRow([key, value]);
@@ -414,7 +414,7 @@ Future<DaftarBelanja?> selectList(CommonUser user) async {
     ..headerStyle = FontStyle.bold
     ..title = "List Daftar Belanja"
     ..insertColumn(header: "No.")
-    ..insertColumn(header: 'Nama Daftar', alignment: TextAlignment.center)
+    ..insertColumn(header: 'Nama Daftar', alignment: TextAlignment.center, width: 50)
     ..insertColumn(header: 'Date Created', alignment: TextAlignment.center)
     ..insertColumn(header: 'Date Update', alignment: TextAlignment.center);
 
@@ -449,12 +449,12 @@ Future<int> spesificList(CommonUser user, DaftarBelanja daftarBelanja, String? e
     ..borderType = BorderType.grid
     ..headerStyle = FontStyle.bold
     ..title = daftarBelanja.namaDaftar
-    ..insertColumn(header: "No.")
-    ..insertColumn(header: "Nama", alignment: TextAlignment.center)
-    ..insertColumn(header: "Harga", alignment: TextAlignment.center)
-    ..insertColumn(header: "Kategori", alignment: TextAlignment.center)
-    ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
-    ..insertColumn(header: "URL", alignment: TextAlignment.center);
+    ..insertColumn(header: "No.", width: 10)
+    ..insertColumn(header: "Nama", alignment: TextAlignment.center, width: 50)
+    ..insertColumn(header: "Harga", alignment: TextAlignment.center, width: 10)
+    ..insertColumn(header: "Kategori", alignment: TextAlignment.center, width: 30)
+    ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center, width: 10)
+    ..insertColumn(header: "URL", alignment: TextAlignment.center, width: 50);
 
   List<Barang> listBarang = await daftarBelanja.getAllBarang();
   int index = 1;
@@ -670,12 +670,12 @@ Future<Barang?> selectDetailBarang({CommonUser? user, Seller? seller, DaftarBela
     ..borderStyle = BorderStyle.square
     ..borderType = BorderType.grid
     ..headerStyle = FontStyle.bold
-    ..insertColumn(header: "No.")
-    ..insertColumn(header: "Nama", alignment: TextAlignment.center)
-    ..insertColumn(header: "Harga", alignment: TextAlignment.center)
-    ..insertColumn(header: "Kategori", alignment: TextAlignment.center)
-    ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
-    ..insertColumn(header: "URL", alignment: TextAlignment.center);
+    ..insertColumn(header: "No.", width: 10)
+    ..insertColumn(header: "Nama", alignment: TextAlignment.center, width: 50)
+    ..insertColumn(header: "Harga", alignment: TextAlignment.center, width: 10)
+    ..insertColumn(header: "Kategori", alignment: TextAlignment.center, width: 30)
+    ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center, width: 10)
+    ..insertColumn(header: "URL", alignment: TextAlignment.center, width: 50);
 
   late String pageName, userName;
   late List<Barang> listBarang;
@@ -753,7 +753,7 @@ int spesificBarang(User user, Barang barang, String? err) {
     ..borderType = BorderType.grid
     ..showHeader = false
     ..insertColumn()
-    ..insertColumn();
+    ..insertColumn(width: 120);
 
   late String pageName, userName;
   late int hasil;
@@ -953,9 +953,9 @@ Future<List?> selectSeller(CommonUser user, List<Map<String, dynamic>> daftarSel
     ..headerStyle = FontStyle.bold
     ..title = "Daftar Toko"
     ..insertColumn(header: "No.")
-    ..insertColumn(header: "Nama Toko", alignment: TextAlignment.center)
+    ..insertColumn(header: "Nama Toko", alignment: TextAlignment.center, width: 50)
     ..insertColumn(header: "No. Telepon", alignment: TextAlignment.center)
-    ..insertColumn(header: "Alamat", alignment: TextAlignment.center);
+    ..insertColumn(header: "Alamat", alignment: TextAlignment.center, width: 80);
 
   List<String> opsi = [];
   int index = 1;
@@ -996,20 +996,80 @@ Future<List?> selectSeller(CommonUser user, List<Map<String, dynamic>> daftarSel
   }
 }
 
-Future<Barang?> selectBarangFromSeller(CommonUser user, Seller seller, DaftarProduk daftarProduk) async {
+int selectBarangFromSeller(CommonUser user, Seller seller, List<Barang> listBarang) {
   Table tabel = Table()
     ..borderStyle = BorderStyle.square
     ..borderType = BorderType.grid
     ..headerStyle = FontStyle.bold
     ..title = "Produk Toko ${seller.nama}"
-    ..insertColumn(header: "No.")
-    ..insertColumn(header: "Nama", alignment: TextAlignment.center)
-    ..insertColumn(header: "Harga", alignment: TextAlignment.center)
-    ..insertColumn(header: "Kategori", alignment: TextAlignment.center)
-    ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center)
-    ..insertColumn(header: "URL", alignment: TextAlignment.center);
+    ..insertColumn(header: "No.", width: 10)
+    ..insertColumn(header: "Nama", alignment: TextAlignment.center, width: 50)
+    ..insertColumn(header: "Harga", alignment: TextAlignment.center, width: 10)
+    ..insertColumn(header: "Kategori", alignment: TextAlignment.center, width: 30)
+    ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center, width: 10)
+    ..insertColumn(header: "URL", alignment: TextAlignment.center, width: 50);
 
-  List<Barang> listBarang = await daftarProduk.getAllBarang();
+  List<String> opsi = ["Cari Barang"];
+  int index = 1;
+
+  for (Barang barang in listBarang) {
+    Map data = barang.showDetail();
+
+    opsi.add("$index. ${data['Nama']}");
+
+    List<Object> row = [
+      index++,
+      data['Nama'],
+      data['Harga'],
+      data['Kategori'],
+      data['Kuantitas'],
+      data['URL'].toString()
+    ];
+
+    tabel.insertRow(row);
+  }
+
+  opsi.add("Kembali");
+
+  header("Pilih Produk", loggedUser: user.nama);
+
+  print(tabel);
+
+  int hasil = Select(prompt: "Pilih Opsi", options: opsi).interact();
+
+  console.clearScreen();
+
+  return hasil;
+}
+
+String? searchForm(CommonUser user) {
+  header("Search Form", loggedUser: user.nama);
+  late String keyword;
+  bool? confirmation;
+
+  
+  keyword = Input(prompt: "Cari Apa?").interact();
+
+  confirmation = Confirm(prompt: "Submit", waitForNewLine: true).interact();
+
+  console.clearScreen();
+
+  return (confirmation) ? keyword : null;
+}
+
+int selectHasilPencarian(CommonUser user, Seller seller, List<Barang> listBarang) {
+  Table tabel = Table()
+    ..borderStyle = BorderStyle.square
+    ..borderType = BorderType.grid
+    ..headerStyle = FontStyle.bold
+    ..title = "Produk Toko ${seller.nama}"
+    ..insertColumn(header: "No.", width: 10)
+    ..insertColumn(header: "Nama", alignment: TextAlignment.center, width: 50)
+    ..insertColumn(header: "Harga", alignment: TextAlignment.center, width: 10)
+    ..insertColumn(header: "Kategori", alignment: TextAlignment.center, width: 30)
+    ..insertColumn(header: "Kuantitas", alignment: TextAlignment.center, width: 10)
+    ..insertColumn(header: "URL", alignment: TextAlignment.center, width: 50);
+
   List<String> opsi = [];
   int index = 1;
 
@@ -1036,11 +1096,11 @@ Future<Barang?> selectBarangFromSeller(CommonUser user, Seller seller, DaftarPro
 
   print(tabel);
 
-  int hasil = Select(prompt: "Pilih Produk", options: opsi).interact();
+  int hasil = Select(prompt: "Pilih Opsi", options: opsi).interact();
 
   console.clearScreen();
 
-  return (hasil == (opsi.length - 1)) ? null : listBarang[hasil];
+  return hasil;
 }
 
 List? detailBarangFromSeller(CommonUser user, Barang barang) {
@@ -1050,7 +1110,7 @@ List? detailBarangFromSeller(CommonUser user, Barang barang) {
     ..showHeader = false
     ..title = "Detail Produk"
     ..insertColumn()
-    ..insertColumn();
+    ..insertColumn(width: 120);
 
   Map<String, dynamic> data = barang.showDetail();
 

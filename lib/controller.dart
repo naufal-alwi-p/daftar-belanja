@@ -309,6 +309,7 @@ Future<void> showSpesificListRoutine(CommonUser user, DaftarBelanja daftarBelanj
         if (data != null) {
           try {
             bool hasil = await selectBarangFromSellerRoutine(user, daftarBelanja, data[0], data[1]);
+
             if (hasil) {
               break;
             }
@@ -325,10 +326,34 @@ Future<void> showSpesificListRoutine(CommonUser user, DaftarBelanja daftarBelanj
 
 Future<bool> selectBarangFromSellerRoutine(CommonUser user, DaftarBelanja daftarBelanja, Seller seller, DaftarProduk daftarProduk) async {
   while (true) {
-    Barang? barang = await selectBarangFromSeller(user, seller, daftarProduk);
+    List<Barang> listBarang = await daftarProduk.getAllBarang();
 
-    if (barang != null) {
-      List? dataBarang = detailBarangFromSeller(user, barang);
+    int hasil = selectBarangFromSeller(user, seller, listBarang);
+
+    if (hasil == (listBarang.length + 1)) {
+      return false;
+    } else if (hasil == 0) {
+      String? keyword = searchForm(user);
+
+      if (keyword != null) {
+        List<Barang> hasilPencarian = await daftarProduk.searchProduct(keyword);
+
+        int hasilPilih = selectHasilPencarian(user, seller, hasilPencarian);
+
+        if (hasilPilih != hasilPencarian.length) {
+          List? dataBarang = detailBarangFromSeller(user, hasilPencarian[hasilPilih]);
+
+          if (dataBarang != null) {
+            bool hasil = await daftarBelanja.tambahBarang(dataBarang[0], dataBarang[1], dataBarang[2], dataBarang[3], dataBarang[4], dataBarang[5]);
+            if (!hasil) {
+              throw (Exception("Gagal Menambahkan Barang"));
+            }
+            return true;
+          }
+        }
+      }
+    } else {
+      List? dataBarang = detailBarangFromSeller(user, listBarang[hasil - 1]);
 
       if (dataBarang != null) {
         bool hasil = await daftarBelanja.tambahBarang(dataBarang[0], dataBarang[1], dataBarang[2], dataBarang[3], dataBarang[4], dataBarang[5]);
@@ -337,8 +362,6 @@ Future<bool> selectBarangFromSellerRoutine(CommonUser user, DaftarBelanja daftar
         }
         return true;
       }
-    } else {
-      return false;
     }
   }
 }
